@@ -1,29 +1,50 @@
-const { Schema, model } = require('mongoose');
-const Joi = require('joi');
+const Joi = require("joi");
+const { Schema, model } = require("mongoose");
 
-module.exports.Product = model('Product', Schema({
-    name: String,
-    description: String,
-    price: Number,
-    category: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true,
+const productSchema = Schema(
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    quantity: Number,
+    description: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+    },
     photo: {
-        data: Buffer,
-        contentType: String,
-    }
-}, { timestamps: true }));
+      data: Buffer,
+      contentType: String,
+    },
+  },
+  { timestamp: true }
+);
 
-module.exports.validate = product => {
-    const schema = Joi.object({
-        name: Joi.string().min(3).max(255).required(),
-        description: Joi.string().max(2000).required(),
-        price: Joi.number().required(),
-        quantity: Joi.number().required(),
-        category: Joi.string().required(),
-    });
-    return schema.validate(product);
-}
+const Product = model("Product", productSchema);
+const validate = (product) => {
+  const schema = Joi.object({
+    name: Joi.string().min(3).max(50).required(),
+    description: Joi.string().min(3).max(2000).required(),
+    price: Joi.number().required(),
+    quantity: Joi.number().required(),
+    category: Joi.string().required(),
+  });
+  return schema.validate(product);
+};
+
+module.exports = {
+  Product,
+  validate,
+};
