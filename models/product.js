@@ -1,5 +1,17 @@
 const Joi = require("joi");
 const { Schema, model } = require("mongoose");
+const { Review, reviewSchema } = require("./review");
+const faqSchema = Schema({
+  userId: Schema.Types.ObjectId,
+
+  question: String,
+  answers: [
+    {
+      answer: String,
+      userId: Schema.Types.ObjectId,
+    },
+  ],
+});
 
 const productSchema = Schema(
   {
@@ -28,6 +40,9 @@ const productSchema = Schema(
       data: Buffer,
       contentType: String,
     },
+    overallRating: Number,
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+    faqs: [faqSchema],
   },
   { timestamp: true }
 );

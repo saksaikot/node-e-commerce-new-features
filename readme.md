@@ -18,3 +18,7 @@ NodeJS সেকশনে একটা ই-কমার্স এপের ক�
 | Purchase History | Show purchase history in User Dashboard                                                                                                            | backend ready react side work           |
 | Discount Coupon  | Admin can add a Coupon and the amount of discount. User can use the coupon to get the discount (Create a new model for coupons)                    | need to implement                       |
 | Validate Payment | Validate the payment after receiving IPN of SSLCommerze (Note: Use GET Request. See the example in documentation)                                  | need to implement                       |
+
+# added review feature
+
+- there are three separate option to rate the product description,quality and service

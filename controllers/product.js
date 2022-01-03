@@ -1,7 +1,10 @@
 const { Product, validate } = require("../models/product");
 const { _pick } = require("../helper/lodash");
 const formidable = require("formidable");
+const mongoose = require("mongoose");
+
 const fs = require("fs");
+const { Review } = require("../models/review");
 const create = async (req, res) => {
   const form = new formidable.IncomingForm();
   form.keepExtensions = true;
@@ -75,6 +78,10 @@ const index = async (req, res) => {
   const products = await Product.find()
     .select({ photo: 0 })
     .populate("category", "name")
+    .populate({
+      path: "reviews",
+      model: "Review",
+    })
     .sort({ [sortBy]: order })
     .limit(limit);
   return res.status(200).send(products);
@@ -155,6 +162,67 @@ const filter = async (req, res) => {
     .limit(limit);
   return res.status(200).send(products);
 };
+
+const createReview = async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) return res.status(404).send("Product not found");
+  let oldRating,
+    newRating,
+    isNewReview = false;
+  const { description, quality, service } = req.body;
+  const newReview = {
+    ...req.body,
+    userId: req.user._id,
+    productId: req.params.id,
+  };
+
+  let review = await Review.findOne({
+    userId: req.user._id,
+    productId: req.params.id,
+  });
+  if (review) {
+    console.log("old review");
+    oldRating = arrayRating([
+      review.description,
+      review.quality,
+      review.service,
+    ]);
+    Object.assign(review, newReview);
+  } else {
+    review = await Review(newReview);
+    product.reviews.push(review._id);
+    isNewReview = true;
+    // await product.save();
+  }
+  const result = await review.save();
+  newRating = arrayRating([description, quality, service]);
+
+  if (isNewReview) {
+    product.overallRating = (
+      (product.overallRating + newRating) /
+      product.reviews.length
+    ).toFixed(2);
+  } else {
+    product.overallRating =
+      (product.overallRating + newRating - oldRating) / product.reviews.length;
+  }
+  await product.save();
+  return res.send(result);
+};
+function arrayRating(arr) {
+  //console.log(arr);
+  let total = 0,
+    items = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i]) {
+      total += arr[i];
+      items++;
+    }
+  }
+  //console.log(total, items);
+  return Number((total / items).toFixed(2));
+}
 module.exports = {
   create,
   index,
@@ -162,4 +230,5 @@ module.exports = {
   store,
   photoById,
   filter,
+  createReview,
 };
