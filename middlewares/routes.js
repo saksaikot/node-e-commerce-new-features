@@ -6,5 +6,6 @@ module.exports = (app) => {
   app.use("/api/profile", require("../routers/profile"));
   app.use("/api/payment", require("../routers/payment"));
   app.use("/api/coupon", require("../routers/coupon"));
+  app.use("/api/order", require("../routers/order"));
   app.use("/*", (req, res) => res.send("running.."));
 };
