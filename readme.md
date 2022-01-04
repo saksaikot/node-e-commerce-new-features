@@ -22,3 +22,7 @@ NodeJS সেকশনে একটা ই-কমার্স এপের ক�
 # added review feature
 
 - there are three separate option to rate the product description,quality and service
+
+# added coupon model
+
+- implemented coupon model index,create,store
